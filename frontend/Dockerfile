@@ -1,11 +1,12 @@
 FROM node:20-alpine
 
-WORKDIR /frontend
+WORKDIR /app
 
-COPY package.json .
+COPY package.json package-lock.json* ./
 RUN npm install
 
-COPY . .
+# ❌ DO NOT COPY SOURCE CODE
+# Source will come from volume
 
 EXPOSE 5173
 

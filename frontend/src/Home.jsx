@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
+
 const API_BASE = "http://0.0.0.0:8000";
 
 function Home() {
+  const navigate = useNavigate();
   const [userId, setUserId] = useState("");
   const [text, setText] = useState("");
   const [backendStatus, setBackendStatus] = useState("");
@@ -14,18 +15,8 @@ function Home() {
   const [error, setError] = useState("");
   const [postResponse, setPostResponse] = useState(null);
 
-  // 1️⃣ Check backend health
-  const checkBackend = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/`);
-      const data = await res.json();
-      setBackendStatus(data.status || "Backend is up");
-    } catch {
-      setBackendStatus("Backend not reachable");
-    }
-  };
 
-  // 2️⃣ Get all reminders
+  // Get all reminders
   const loadReminders = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/all/reminders/`);
@@ -36,7 +27,7 @@ function Home() {
     }
   };
 
-  // 3️⃣ Create reminder
+  // Create reminder
   const scheduleReminder = async () => {
     setLoading(true);
     setError("");
@@ -70,13 +61,9 @@ function Home() {
     <div style={styles.page}>
       {/* NAVBAR */}
       <div style={styles.nav}>
-        <button style={styles.navBtn} onClick={checkBackend}>
-          Is Backend Up?
-        </button>
         <button style={styles.navBtn} onClick={() => navigate("/schedules")}>
-          Get Schedules
+          List All Schedules
         </button>
-        <span style={styles.status}>{backendStatus}</span>
       </div>
 
       {/* MAIN CARD */}
@@ -85,7 +72,7 @@ function Home() {
 
         <input
           style={styles.input}
-          placeholder="User ID (e.g. 1)"
+          placeholder="User Id (e.g. 1)"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
         />
