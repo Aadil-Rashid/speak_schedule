@@ -14,7 +14,35 @@ function Home() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [postResponse, setPostResponse] = useState(null);
+  const [isListening, setIsListening] = useState(false);
 
+
+  // Voice to text
+  const handleVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setText(prev => prev ? `${prev} ${transcript}` : transcript);
+    };
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false);
+    };
+
+    recognition.start();
+  };
 
   // Get all reminders
   const loadReminders = async () => {
@@ -84,7 +112,20 @@ function Home() {
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>Reminder Text</label>
+            <div style={styles.labelContainer}>
+              <label style={styles.label}>Reminder Text</label>
+              <button 
+                style={{
+                  ...styles.micBtn,
+                  background: isListening ? "#ef4444" : "#1e293b",
+                  borderColor: isListening ? "#ef4444" : "#334155"
+                }} 
+                onClick={handleVoiceInput}
+                title="Speak your reminder"
+              >
+                {isListening ? "⏹ Listening..." : "🎤 Speak"}
+              </button>
+            </div>
             <textarea
               style={styles.textarea}
               placeholder="e.g. Remind me to call Mom tomorrow at 10am"
@@ -218,8 +259,26 @@ const styles = {
     display: "block",
     fontSize: "14px",
     fontWeight: "500",
-    marginBottom: "8px",
     color: "#94a3b8",
+  },
+  labelContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "8px",
+  },
+  micBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "4px 10px",
+    background: "#1e293b",
+    color: "#cbd5e1",
+    border: "1px solid #334155",
+    borderRadius: "14px",
+    fontSize: "12px",
+    cursor: "pointer",
+    transition: "all 0.2s",
   },
   input: {
     width: "100%",
