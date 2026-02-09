@@ -61,70 +61,91 @@ function Home() {
     <div style={styles.page}>
       {/* NAVBAR */}
       <div style={styles.nav}>
+        <div style={styles.logo}>Schedule</div>
         <button style={styles.navBtn} onClick={() => navigate("/schedules")}>
-          List All Schedules
+          View All Schedules
         </button>
       </div>
 
-      {/* MAIN CARD */}
-      <div style={styles.card}>
-        <h2>Speak it. Schedule it. Done.</h2>
+      <div style={styles.content}>
+        {/* MAIN CARD */}
+        <div style={styles.card}>
+          <h2 style={styles.title}>Schedule Messages.</h2>
+          <p style={styles.subtitle}>Enter a message and we'll handle the scheduling for you.</p>
 
-        <input
-          style={styles.input}
-          placeholder="User Id (e.g. 1)"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-        />
-
-        <input
-          style={styles.input}
-          placeholder="Schedule text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-
-        <button
-          style={styles.primaryBtn}
-          disabled={loading || !userId || !text}
-          onClick={scheduleReminder}
-        >
-          {loading ? "Scheduling..." : "Schedule Reminder"}
-        </button>
-
-        {postResponse && (
-          <div style={styles.successBox}>
-            <strong>Scheduled Successfully</strong>
-            <div>User Id: {postResponse.user_id}</div>
-            <div>Text: {postResponse.original_text}</div>
-            <div>Scheduled Time: {postResponse.scheduled_time}</div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>User ID</label>
+            <input
+              style={styles.input}
+              placeholder="e.g. 1"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+            />
           </div>
-        )}
-        {error && <p style={styles.error}>{error}</p>}
 
-        <h4>Scheduled Reminders</h4>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Reminder Text</label>
+            <textarea
+              style={styles.textarea}
+              placeholder="e.g. Remind me to call Mom tomorrow at 10am"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            />
+          </div>
+
+          <button
+            style={{
+              ...styles.primaryBtn,
+              opacity: loading || !userId || !text ? 0.6 : 1,
+              cursor: loading || !userId || !text ? "not-allowed" : "pointer"
+            }}
+            disabled={loading || !userId || !text}
+            onClick={scheduleReminder}
+          >
+            {loading ? "Scheduling..." : "Schedule Reminder"}
+          </button>
+
+          {postResponse && (
+            <div style={styles.successBox}>
+              <div style={styles.successHeader}>
+                <span style={{ fontSize: "18px" }}>✅</span>
+                <strong>Scheduled Successfully</strong>
+              </div>
+              <div style={styles.successContent}>
+                <div style={styles.successItem}><span>User ID:</span> <span>{postResponse.user_id}</span></div>
+                <div style={styles.successItem}><span>Text:</span> <span>{postResponse.original_text}</span></div>
+                <div style={styles.successItem}><span>Scheduled Time:</span> <span>{postResponse.scheduled_time}</span></div>
+              </div>
+            </div>
+          )}
+          {error && <div style={styles.errorBox}>{error}</div>}
+        </div>
+
+        {/* RECENT REMINDERS */}
         {reminders.length > 0 && (
-          <>
-            <h4>Scheduled Reminders</h4>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th>User ID</th>
-                  <th>Text</th>
-                  <th>Scheduled Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reminders.map((r, i) => (
-                  <tr key={i}>
-                    <td>{r.user_id}</td>
-                    <td>{r.original_text}</td>
-                    <td>{r.scheduled_time}</td>
+          <div style={styles.tableCard}>
+            <h3 style={styles.tableTitle}>Recent Schedules</h3>
+            <div style={styles.tableContainer}>
+              <table style={styles.table}>
+                <thead>
+                  <tr style={styles.headerRow}>
+                    <th style={styles.th}>User ID</th>
+                    <th style={styles.th}>Text</th>
+                    <th style={styles.th}>Time</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
+                </thead>
+                <tbody>
+                  {reminders.slice(0, 5).map((r, i) => (
+                    <tr key={i} style={styles.row}>
+                      <td style={styles.td}>{r.user_id}</td>
+                      <td style={styles.td}>{r.original_text}</td>
+                      <td style={styles.td}>{r.scheduled_time}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -136,67 +157,184 @@ const styles = {
     minHeight: "100vh",
     background: "linear-gradient(135deg, #0f172a, #020617)",
     color: "#e5e7eb",
+    fontFamily: "'Inter', sans-serif",
   },
   nav: {
     display: "flex",
-    gap: 10,
-    padding: 12,
-    background: "#020617",
-    borderBottom: "1px solid #1e293b",
+    justifyContent: "space-between",
     alignItems: "center",
+    padding: "16px 40px",
+    background: "rgba(2, 6, 23, 0.8)",
+    backdropFilter: "blur(10px)",
+    borderBottom: "1px solid #1e293b",
+  },
+  logo: {
+    fontSize: "20px",
+    fontWeight: "700",
+    background: "linear-gradient(to right, #60a5fa, #a855f7)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
   navBtn: {
-    padding: "6px 12px",
+    padding: "8px 16px",
     background: "#1e293b",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
+    color: "#cbd5e1",
+    border: "1px solid #334155",
+    borderRadius: "8px",
     cursor: "pointer",
+    fontSize: "14px",
+    transition: "all 0.2s",
   },
-  status: {
-    marginLeft: "auto",
-    fontSize: 12,
-    color: "#94a3b8",
+  content: {
+    maxWidth: "800px",
+    margin: "0 auto",
+    padding: "40px 20px",
   },
   card: {
-    maxWidth: 480,
-    margin: "40px auto",
-    padding: 24,
-    background: "rgba(15,23,42,0.9)",
-    borderRadius: 12,
+    padding: "32px",
+    background: "rgba(30, 41, 59, 0.4)",
+    borderRadius: "16px",
+    border: "1px solid #1e293b",
+    marginBottom: "32px",
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+  },
+  title: {
+    fontSize: "28px",
+    fontWeight: "700",
+    marginBottom: "8px",
+    textAlign: "center",
+    color: "#f8fafc",
+  },
+  subtitle: {
+    fontSize: "16px",
+    color: "#94a3b8",
+    textAlign: "center",
+    marginBottom: "32px",
+  },
+  formGroup: {
+    marginBottom: "20px",
+  },
+  label: {
+    display: "block",
+    fontSize: "14px",
+    fontWeight: "500",
+    marginBottom: "8px",
+    color: "#94a3b8",
   },
   input: {
     width: "100%",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 6,
-    border: "1px solid #334155",
+    padding: "12px 16px",
     background: "#020617",
-    color: "#fff",
+    border: "1px solid #334155",
+    borderRadius: "8px",
+    color: "#f8fafc",
+    fontSize: "15px",
+    outline: "none",
+    transition: "border-color 0.2s",
+    boxSizing: "border-box",
+  },
+  textarea: {
+    width: "100%",
+    padding: "12px 16px",
+    background: "#020617",
+    border: "1px solid #334155",
+    borderRadius: "8px",
+    color: "#f8fafc",
+    fontSize: "15px",
+    outline: "none",
+    minHeight: "100px",
+    resize: "vertical",
+    transition: "border-color 0.2s",
+    boxSizing: "border-box",
   },
   primaryBtn: {
     width: "100%",
-    padding: 10,
-    borderRadius: 6,
+    padding: "14px",
     background: "#2563eb",
-    border: "none",
     color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    fontWeight: "600",
     cursor: "pointer",
+    marginTop: "12px",
+    transition: "background 0.2s",
   },
-  success: { color: "#22c55e", marginTop: 10 },
-  error: { color: "#ef4444", marginTop: 10 },
   successBox: {
-    marginTop: 16,
-    padding: 12,
-    background: "#052e16",
-    border: "1px solid #2f6845",
-    borderRadius: 6,
-    color: "#f2f700",
+    marginTop: "24px",
+    background: "rgba(20, 83, 45, 0.2)",
+    border: "1px solid #166534",
+    borderRadius: "12px",
+    padding: "20px",
+  },
+  successHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    marginBottom: "16px",
+    color: "#4ade80",
+  },
+  successContent: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  successItem: {
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "14px",
+    color: "#cbd5e1",
+  },
+  errorBox: {
+    marginTop: "16px",
+    padding: "12px",
+    background: "rgba(153, 27, 27, 0.2)",
+    border: "1px solid #991b1b",
+    borderRadius: "8px",
+    color: "#f87171",
+    textAlign: "center",
+  },
+  tableCard: {
+    background: "rgba(30, 41, 59, 0.2)",
+    borderRadius: "16px",
+    border: "1px solid #1e293b",
+    padding: "24px",
+  },
+  tableTitle: {
+    fontSize: "18px",
+    fontWeight: "600",
+    marginBottom: "16px",
+    color: "#f8fafc",
+  },
+  tableContainer: {
+    background: "rgba(15, 23, 42, 0.4)",
+    borderRadius: "12px",
+    border: "1px solid #1e293b",
+    overflow: "hidden",
   },
   table: {
     width: "100%",
-    marginTop: 16,
     borderCollapse: "collapse",
+    textAlign: "left",
+  },
+  headerRow: {
+    background: "#1e293b",
+  },
+  th: {
+    padding: "12px 16px",
+    fontSize: "12px",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    color: "#94a3b8",
+  },
+  row: {
+    borderBottom: "1px solid #1e293b",
+  },
+  td: {
+    padding: "12px 16px",
+    fontSize: "14px",
+    color: "#cbd5e1",
   },
 };
 

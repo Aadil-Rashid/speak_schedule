@@ -56,13 +56,6 @@ def create_reminder(payload: ReminderRequest):
 @app.get("/api/all/reminders/", response_model=List[ReminderResponse])
 def get_all_reminders(db: Session = Depends(get_db)):
     reminders = db.query(Reminder).all()
-
-    if not reminders:
-        raise HTTPException(
-            status_code=404,
-            detail="No reminders found"
-        )
-
     return reminders
 
 
