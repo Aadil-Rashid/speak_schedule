@@ -1,0 +1,56 @@
+########################
+# OS / Editor
+########################
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+########################
+# Python / FastAPI
+########################
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+.env
+.venv
+venv/
+env/
+
+########################
+# Database
+########################
+backend/reminders.db
+*.sqlite3
+
+########################
+# Node / Vite / React
+########################
+node_modules/
+frontend/node_modules/
+
+dist/
+frontend/dist/
+.vite/
+
+########################
+# Build artifacts
+########################
+build/
+*.egg-info/
+
+########################
+# Docker
+########################
+*.pid
+docker-compose.override.yml
+
+########################
+# Misc
+########################
+coverage/
+htmlcov/
+.cache/
+
